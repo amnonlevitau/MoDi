@@ -1,85 +1,44 @@
-from t2m.final_evaluations import *
+from t2m.final_evaluations import FinalEval, DummyArgs
 from dataclasses import dataclass
 
-@dataclass
-class DummyArgs():
-    ckpt = '../chk/checkpoint/001999.pt'
-    path = '/content/drive/MyDrive/MoDi/MoDi/examples/preprocessed_data_small/edge_rot_joints_1_frames_64.npy'
-    out_path = ''
+from Motion.BVH import load as bvh_load
+from Motion.Animation import positions_global
+from utils.humanml_utils import position_to_humanml
+import numpy as np
+from os.path import join as pjoin
+from glob import glob
+from tqdm import tqdm
+import os 
 
-    device_id = 3
-    device = torch.device('cuda:%d'%device_id if torch.cuda.is_available() else 'cpu')
+def create_test_std_mean(modi_folder_path, out_path):
+    first = True
+    anim_parts = glob(pjoin(modi_folder_path,'*.bvh'))
+    for part_path in tqdm(anim_parts):
+        a, nm,_ = bvh_load(pjoin(part_path))
+        motion,_,_,_ = position_to_humanml(positions_global(a), nm)
 
-    motions=1 # for 1 motion for each sentence
-    criteria = 'torch.nn.MSELoss()'
-    truncation =1
-    truncation_mean = 4096
-    simple_idx = 0
-    sample_seeds = None
-    no_idle = False
-    return_sub_motions = False
+        if first:
+            animations=motion
+            first = False
+        else:
+            animations = np.concatenate((animations,motion), axis=0)
 
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
 
-if __name__=='__main__':
-    evaluation(log_file)
-
-    # args = DummyArgs()
-
-    # # dataset_opt_path = './t2m/checkpoints/kit/Comp_v6_KLD005/opt.txt'
-    # dataset_opt_path = './t2m/checkpoints/t2m/Comp_v6_KLD01/opt.txt'
-    # eval_motion_loaders = {
-    #     ################
-    #     ## HumanML3D Dataset##
-    #     ################
-    #     # 'Comp_v6_KLD01': lambda: get_motion_loader(
-    #     #     './checkpoints/t2m/Comp_v6_KLD01/opt.txt',
-    #     #     batch_size, gt_dataset, mm_num_samples, mm_num_repeats, device
-    #     # ),
-
-    #       ################
-    #     ## MoDi Dataset##
-    #     ################
-    #     'MoDi': lambda: get_modi_loader(
-    #         './t2m/checkpoints/t2m/Comp_v6_KLD01/opt.txt', # keep this for other options
-    #         batch_size, gt_dataset, mm_num_samples, mm_num_repeats, device,
-    #         args=args # add dummyy args here
-    #     )
-
-    #     ################
-    #     ## KIT Dataset##
-    #     ################
-    #     # 'Comp_v6_KLD005': lambda: get_motion_loader(
-    #     #     './checkpoints/kit/Comp_v6_KLD005/opt.txt',
-    #     #     batch_size, gt_dataset, mm_num_samples, mm_num_repeats, device
-    #     # ),
-    # }
-
-    # device_id = 0
-    # device = torch.device('cuda:%d'%device_id if torch.cuda.is_available() else 'cpu')
-    # #torch.cuda.set_device(device_id)
-
-    # mm_num_samples = 100
-    # # mm_num_samples = 0
-
-    # mm_num_repeats = 30
-    # mm_num_times = 10
-
-    # diversity_times = 300
-    # replication_times = 20
-    # batch_size = 32
+    np.save(pjoin(out_path,'std.npy'),np.std(animations, axis=0))
+    np.save(pjoin(out_path,'mean.npy'),np.mean(animations, axis=0))
 
 
-    # # mm_num_samples = 100
-    # mm_num_repeats = 1
-    
-    # # batch_size = 1
 
-    # gt_loader, gt_dataset = get_dataset_motion_loader(dataset_opt_path, batch_size, device)
-    # wrapper_opt = get_opt(dataset_opt_path, device)
-    # eval_wrapper = EvaluatorModelWrapper(wrapper_opt)
 
-    # log_file = args.out_path if args.out_path!='' else './t2m_evaluation.log'
+if __name__ == '__main__':
+    # run the evaluation
 
-    # MoDiTests(eval_motion_loaders,mm_num_samples,mm_num_repeats,mm_num_times,diversity_times,replication_times,batch_size,gt_loader,gt_dataset,wrapper_opt,log_file)
-    
-    # # animation_4_user_study('./user_study_t2m/')
+    log_file = DummyArgs.out_path if DummyArgs.out_path != '' else './t2m_evaluation.log'
+    FinalEval().evaluation(log_file)
+
+    # # use this to generate mean and std for processed data
+    # # place the files in the checkpoints/t2m/Comp_v6_KLD01/meta
+    # create_test_std_mean(r"D:\Documents\University\DeepGraphicsWorkshop\data\preprocessed_data_test",
+    #                      r"D:\Documents\University\DeepGraphicsWorkshop\data\eval_std_mean")

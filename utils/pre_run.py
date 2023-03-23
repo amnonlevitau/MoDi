@@ -90,6 +90,7 @@ class TrainOptions(TrainBaseOptions):
                             help='path to ground truth file that was used during action recognition train. Not needed unless is different from the one used by the synthesis network')
         parser.add_argument("--dataset_texts_path", type=str, default=None, help='path to a file containing ordered filenames of the split dataset')
         parser.add_argument("--dataset_texts_root", type=str, default=None, help='path to directory containing the actual text files')
+        parser.add_argument("--mask_rate", type=float, default=0.0, help='probability of the text being replaced with ""')
         self.parser = parser
 
     def after_parse(self, args):
@@ -151,7 +152,10 @@ class GenerateOptions(TestBaseOptions):
         parser.add_argument('--edit_radius', type=float,
                             help='Editing radius (i.e., max change of W in editing direction)')
         parser.add_argument('--text_path', type=str, help='Path to texts to generate', default=None)
-
+        parser.add_argument('--std_dev', default=1.0, type=float,
+                            help='The std_dev to use for the noise (should be the same as the text embeddings)')
+        parser.add_argument('--cfg', default=None, type=float, help="cfg in latent space")
+        parser.add_argument('--seeds_num', default=1, type=int, help="number of seeds per text")
 class EvaluateOptions(TestBaseOptions):
     def __init__(self):
         super().__init__()
