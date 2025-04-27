@@ -4,31 +4,23 @@
 
 ![Python](https://img.shields.io/badge/Python->=3.6.10-Blue?logo=python)  ![Pytorch](https://img.shields.io/badge/PyTorch->=1.5.0-Red?logo=pytorch)
 
-This repository provides a library for unconditional motion synthesis from diverse data, as well as applications including interpolation and semantic editing in the latent space, inversion, and code for quantitative evaluation. It is based on our work [MoDi: Unconditional Motion Synthesis from Diverse Data](https://sigal-raab.github.io/MoDi.html).
+This repository provides a library for conditional motion synthesis from diverse data, as well as applications including interpolation and semantic editing in the latent space, inversion, and code for quantitative evaluation. 
+It is a conditional upgrade of its parent repository. 
 
-<div>
-  <span class="center">
-    <img src="https://github.com/sigal-raab/sigal-raab.github.io/tree/main/images/jump_teaser.gif" style="width: 20vw;">
-    <img src="images/walk_teaser.gif" style="width: 20vw;">
-    <img src="images/dance_teaser.gif" style="width: 20vw;">
-    <img src="images/salto_teaser.gif" style="width: 20vw;">
-  </span>
-</div>
-
-The library is still under development.
+The library is no longer under development.
 
 
 ## Prerequisites
 
 This code has been tested under Ubuntu 16.04 and Cuda 10.2. Before starting, please configure your Conda environment by
 ~~~bash
-conda env create --name MoDi --file environment.yaml
-conda activate MoDi
+conda env create --name CMoDi --file environment.yaml
+conda activate CMoDi
 ~~~
 or by 
 ~~~bash
-conda create -n MoDi python=3.6.10
-conda activate MoDi
+conda create -n CMoDi python=3.6.10
+conda activate CMoDi
 conda install -y pytorch==1.5.0 torchvision==0.6.0 -c pytorch
 conda install -y -c conda-forge tqdm
 conda install -y -c conda-forge opencv
@@ -178,7 +170,7 @@ Part of the evaluation examples are taken from [HumanAct12](https://github.com/E
 
 ## Citation
 
-If you use this code for your research, please cite our paper:
+If you use this code for your research, please cite the original paper:
 
 ~~~bibtex
 @article{raab2022modi,
